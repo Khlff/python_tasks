@@ -107,7 +107,7 @@ def extract_general_male(stat):
 
     for key in general_boy_stat:
         answer_list.append((key, general_boy_stat[key]))
-    return sorted(answer_list, key=lambda x: x[1], reverse=False)
+    return sorted(answer_list, key=lambda x: x[1], reverse=True)
 
 
 def extract_general_female(stat):
@@ -130,7 +130,7 @@ def extract_general_female(stat):
     for key in general_girl_stat:
         answer_list.append((key, general_girl_stat[key]))
 
-    return sorted(answer_list, key=lambda x: x[1], reverse=False)
+    return sorted(answer_list, key=lambda x: x[1], reverse=True)
 
 
 def extract_year(stat, year):
@@ -164,7 +164,7 @@ def extract_year(stat, year):
         answer_list.append((key, general_girl_stat[key]))
     for key in general_boy_stat:
         answer_list.append((key, general_boy_stat[key]))
-    return sorted(answer_list, key=lambda x: x[1], reverse=False)
+    return sorted(answer_list, key=lambda x: x[1], reverse=True)
 
 
 def extract_year_male(stat, year):
@@ -175,11 +175,20 @@ def extract_year_male(stat, year):
     Список должен быть отсортирован по убыванию количества.
     """
     answer_list = []
+    general_boy_stat = {}
+    boys_dict = stat['boys_stat']
+    key = year
 
-    boys_dict = stat['Answer']['boys_stat']
-    for i in boys_dict[year].keys():
-        answer_list.append((i, boys_dict[year][i]))
-    return sorted(answer_list, key=lambda x: x[1], reverse=False)
+    for i in boys_dict[key].keys():
+        if i in general_boy_stat.keys():
+            general_boy_stat[i] += boys_dict[key][i]
+        else:
+            general_boy_stat[i] = boys_dict[key][i]
+
+    for key in general_boy_stat:
+        answer_list.append((key, general_boy_stat[key]))
+
+    return sorted(answer_list, key=lambda x: x[1], reverse=True)
 
 
 def extract_year_female(stat, year):
@@ -190,11 +199,20 @@ def extract_year_female(stat, year):
     Список должен быть отсортирован по убыванию количества.
     """
     answer_list = []
+    general_girl_stat = {}
+    girls_dict = stat['girls_stat']
 
-    girls_dict = stat['Answer']['girls_stat']
-    for i in girls_dict[year].keys():
-        answer_list.append((i, girls_dict[year][i]))
-    return sorted(answer_list, key=lambda x: x[1], reverse=False)
+    key = year
+    for i in girls_dict[key].keys():
+        if i in general_girl_stat.keys():
+            general_girl_stat[i] += girls_dict[key][i]
+        else:
+            general_girl_stat[i] = girls_dict[key][i]
+
+    for key in general_girl_stat:
+        answer_list.append((key, general_girl_stat[key]))
+
+    return sorted(answer_list, key=lambda x: x[1], reverse=True)
 
 
 if __name__ == '__main__':
