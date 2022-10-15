@@ -1,27 +1,33 @@
 import re
-import urllib.request
 
 
-def make_stat(url):
+def make_stat(filepath):
     unusual_male_names = ('Никита', 'Илья', 'Лёва')
     unusual_female_names = ('Любовь')
     result_of_boys = {}
     result_of_girls = {}
 
-    try:
-        get_url = urllib.request.urlopen(url)
+    with open(filepath, 'r', encoding='windows-1251') as file:
         last_year = 0
 
-        for string in get_url:
-            decoded_string = string.decode('windows-1251')
-            year = re.findall(r'(?<=<h3>)(.*)(?=</h3>)', decoded_string)
-            fullname = re.findall(r'(?<=/>)(.*)(?=</a>)', decoded_string)
+        for string in file:
+            fullname = ''
+            year = ''
+            first_name_index = string.find('/">')
+            second_name_index = string.find("</a>")
+            if first_name_index + second_name_index != -2:
+                fullname = string[first_name_index + 3:second_name_index]
 
-            if len(year) != 0:
-                last_year = int(year[0])
+            first_year_index = string.find("<h3>")
+            second_year_index = string.find("</h3>")
+            if first_year_index + second_year_index != -2:
+                year = string[first_year_index + 4:second_year_index]
 
-            if len(fullname) != 0:
-                name = fullname[0].split()[1]
+            if year != '':
+                last_year = year
+
+            if fullname != '':
+                name = fullname.split()[1]
                 if name[-1] == 'а' or name[-1] == 'я':
                     if name in unusual_male_names:
                         if last_year in result_of_boys.keys():
@@ -58,14 +64,12 @@ def make_stat(url):
                             result_of_boys[last_year][name] = 1
                     else:
                         result_of_boys[last_year] = {name: 1}
-        return {"Code": 0, "Answer": {'girls_stat': result_of_girls,
-                                      'boys_stat': result_of_boys}}
-    except urllib.error.URLError:
-        return {"Code": 1, "Answer": ""}
+        return {'girls_stat': result_of_girls, 'boys_stat': result_of_boys}
 
-    """
-    Функция вычисляет статистику по именам за каждый год с учётом пола.
-    """
+
+"""
+Функция вычисляет статистику по именам за каждый год с учётом пола.
+"""
 
 
 def extract_years(stat):
@@ -74,11 +78,13 @@ def extract_years(stat):
     упорядоченный по возрастанию.
     """
     return sorted(
-        list(stat['Answer']['girls_stat'].keys()) or
-        list(stat['Answer']['boys_stat'].keys()))
+        list(stat['girls_stat'].keys()) or
+        list(stat['boys_stat'].keys()))
 
 
-# print(make_stat('http://shannon.usu.edu.ru/ftp/python/hw2/home.html')['Answer']['girls_stat'])
+print(make_stat('home.html'))
+
+
 # print(extract_years(make_stat('http://shannon.usu.edu.ru/ftp/python/hw2/home.html')))
 
 def extract_general(stat):
@@ -97,10 +103,6 @@ def extract_general(stat):
         for i in boys_dict[key].keys():
             answer_list.append((i, boys_dict[key][i]))
     return sorted(answer_list, key=lambda x: x[1], reverse=True)
-
-
-stat = make_stat('http://shannon.usu.edu.ru/ftp/python/hw2/home.html')
-print(extract_general(stat))
 
 
 def extract_general_male(stat):
