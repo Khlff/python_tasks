@@ -4,7 +4,7 @@ def make_stat(filepath):
     result_of_boys = {}
     result_of_girls = {}
 
-    with open(filepath, 'r', encoding='windows-1251') as file:
+    with open(filepath, 'r', encoding='cp1251') as file:
         last_year = 0
 
         for string in file:
@@ -25,7 +25,8 @@ def make_stat(filepath):
 
             if fullname != '':
                 name = fullname.split()[1]
-                if name[-1] == 'а' or name[-1] == 'я' or name in unusual_female_names:
+                if name[-1] == 'а' or name[-1] == 'я' or \
+                        name in unusual_female_names:
                     if name in unusual_male_names:
                         if last_year in result_of_boys.keys():
                             if name in result_of_boys[last_year].keys():
@@ -57,8 +58,7 @@ def make_stat(filepath):
 
 def extract_years(stat):
     return sorted(
-        list(stat['girls_stat'].keys()) or
-        list(stat['boys_stat'].keys()))
+        list(stat['girls_stat'].keys()) or list(stat['boys_stat'].keys()))
 
 
 def extract_general(stat):
@@ -68,18 +68,21 @@ def extract_general(stat):
 
     girls_dict = stat['girls_stat']
     boys_dict = stat['boys_stat']
-    for key in extract_years(stat):
+
+    years = sorted(
+        list(stat['girls_stat'].keys()) or list(stat['boys_stat'].keys()))
+    for key in years:
         for i in girls_dict[key].keys():
             if i in general_girl_stat.keys():
                 general_girl_stat[i] += girls_dict[key][i]
             else:
                 general_girl_stat[i] = girls_dict[key][i]
 
-        for i in boys_dict[key].keys():
-            if i in general_boy_stat.keys():
-                general_boy_stat[i] += boys_dict[key][i]
+        for k in boys_dict[key].keys():
+            if k in general_boy_stat.keys():
+                general_boy_stat[k] += boys_dict[key][k]
             else:
-                general_boy_stat[i] = boys_dict[key][i]
+                general_boy_stat[k] = boys_dict[key][k]
 
     for key in general_girl_stat:
         answer_list.append((key, general_girl_stat[key]))
@@ -185,7 +188,7 @@ def extract_year_male(stat, year):
         else:
             general_boy_stat[i] = boys_dict[key][i]
 
-    for key in general_boy_stat:
+    for key in general_boy_stat.keys():
         answer_list.append((key, general_boy_stat[key]))
 
     return sorted(answer_list, key=lambda x: x[1], reverse=True)
@@ -202,18 +205,13 @@ def extract_year_female(stat, year):
     general_girl_stat = {}
     girls_dict = stat['girls_stat']
 
-    key = year
-    for i in girls_dict[key].keys():
+    for i in girls_dict[year].keys():
         if i in general_girl_stat.keys():
-            general_girl_stat[i] += girls_dict[key][i]
+            general_girl_stat[i] += girls_dict[year][i]
         else:
-            general_girl_stat[i] = girls_dict[key][i]
+            general_girl_stat[i] = girls_dict[year][i]
 
-    for key in general_girl_stat:
+    for key in general_girl_stat.keys():
         answer_list.append((key, general_girl_stat[key]))
 
     return sorted(answer_list, key=lambda x: x[1], reverse=True)
-
-
-if __name__ == '__main__':
-    pass
