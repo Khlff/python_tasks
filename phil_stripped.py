@@ -11,7 +11,7 @@ def get_content(name):
     try:
         url = 'https://ru.wikipedia.org/wiki/' + parse.quote(name)
         result = request.urlopen(url)
-        return result.read().decode(result.headers.get_content_charset())
+        return result.read().decode(result.headers.get_content_charset()).replace('\n', '')
     except error.HTTPError:
         return None
     except error.URLError:
@@ -29,13 +29,21 @@ def extract_content(page):
 
     if page is None:
         return (0, 0)
-    # print(re.findall(page, r'\\class="vector-body">.*?\\<div id="mw-navigation">'))
-    first_index = page.find('class="vector-body">')
-    second_index = page.find('<div id="mw-navigation">')
-    return page[first_index:second_index]
+
+    resultOfSearch = \
+        re.findall(r'<div id="content" class="mw-body" role="main">(.*)</div><div id="mw-navigation">', page)[0]
+
+    return resultOfSearch if resultOfSearch != '' else (0, 0)
+
+    # first_index = page.find('class="vector-body">') - 20
+    # if first_index == -21:
+    #     return (0, 0)
+    # second_index = page.find('<div id="mw-navigation">')
+    # return page[first_index:second_index]
 
 
-print(extract_content(get_content('Ящерицы')))
+# print(extract_content(get_content('Ящерицы')))
+extract_content(get_content('Ящерицы'))
 
 
 def extract_links(page, begin, end):
@@ -44,7 +52,7 @@ def extract_links(page, begin, end):
     задающего позицию содержимого статьи на странице и возвращает все имеющиеся
     ссылки на другие вики-страницы без повторений и с учётом регистра.
     """
-    pass
+
 
 
 def find_chain(start, finish):
