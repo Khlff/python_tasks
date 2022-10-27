@@ -10,7 +10,7 @@ def make_stat(filepath):
         for string in file:
             fullname = ''
             year = ''
-            first_name_index = string.find('/">')
+            first_name_index = string.find('/>')
             second_name_index = string.find("</a>")
             if first_name_index != -1 and second_name_index != -1:
                 fullname = string[first_name_index + 3:second_name_index]
@@ -25,8 +25,8 @@ def make_stat(filepath):
 
             if fullname != '':
                 name = fullname.split()[1]
-                if name[-1] == 'а' or name[-1] == 'я' or \
-                        name in unusual_female_names:
+                if (name[-1] == 'а') or (name[-1] == 'я') or (
+                        name in unusual_female_names):
                     if name in unusual_male_names:
                         if last_year in result_of_boys.keys():
                             if name in result_of_boys[last_year].keys():
