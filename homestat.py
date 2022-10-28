@@ -4,7 +4,7 @@ def make_stat(filepath):
     result_of_boys = {}
     result_of_girls = {}
 
-    with open(filepath, 'r', encoding='cp1251') as file:
+    with open(filepath, 'r', encoding='utf-8') as file:
         last_year = 0
 
         for string in file:
@@ -61,33 +61,22 @@ def extract_years(stat):
         list(stat['girls_stat'].keys()) or list(stat['boys_stat'].keys()))
 
 
-def extract_general(stat):
+def extract_general_indefinite(stat, sex):
     answer_list = []
-    general_girl_stat = {}
-    general_boy_stat = {}
+    general_stat = {}
 
-    girls_dict = stat['girls_stat']
-    boys_dict = stat['boys_stat']
+    sex_dict = stat['girls_stat' if sex == 'girls' else 'boys_stat']
 
-    years = sorted(
-        list(stat['girls_stat'].keys()) or list(stat['boys_stat'].keys()))
-    for key in years:
-        for i in girls_dict[key].keys():
-            if i in general_girl_stat.keys():
-                general_girl_stat[i] += girls_dict[key][i]
+    for key in extract_years(stat):
+        for i in sex_dict[key].keys():
+            if i in general_stat.keys():
+                general_stat[i] += sex_dict[key][i]
             else:
-                general_girl_stat[i] = girls_dict[key][i]
+                general_stat[i] = sex_dict[key][i]
 
-        for k in boys_dict[key].keys():
-            if k in general_boy_stat.keys():
-                general_boy_stat[k] += boys_dict[key][k]
-            else:
-                general_boy_stat[k] = boys_dict[key][k]
+    for key in general_stat:
+        answer_list.append((key, general_stat[key]))
 
-    for key in general_girl_stat:
-        answer_list.append((key, general_girl_stat[key]))
-    for key in general_boy_stat:
-        answer_list.append((key, general_boy_stat[key]))
     return sorted(answer_list, key=lambda x: x[1], reverse=True)
 
 
@@ -97,20 +86,7 @@ def extract_general_male(stat):
     (имя, количество) общей статистики для имён мальчиков.
     Список должен быть отсортирован по убыванию количества.
     """
-    answer_list = []
-    general_boy_stat = {}
-
-    boys_dict = stat['boys_stat']
-    for key in extract_years(stat):
-        for i in boys_dict[key].keys():
-            if i in general_boy_stat.keys():
-                general_boy_stat[i] += boys_dict[key][i]
-            else:
-                general_boy_stat[i] = boys_dict[key][i]
-
-    for key in general_boy_stat:
-        answer_list.append((key, general_boy_stat[key]))
-    return sorted(answer_list, key=lambda x: x[1], reverse=True)
+    return extract_general_indefinite(stat, 'boys')
 
 
 def extract_general_female(stat):
@@ -119,54 +95,30 @@ def extract_general_female(stat):
     (имя, количество) общей статистики для имён девочек.
     Список должен быть отсортирован по убыванию количества.
     """
+    return extract_general_indefinite(stat, 'girls')
+
+
+def extract_general(stat):
+    return sorted(extract_general_male(stat) + extract_general_female(stat),
+                  key=lambda x: x[1],
+                  reverse=True)
+
+
+def extract_year_indefinite(stat, year, sex):
     answer_list = []
-    general_girl_stat = {}
-
-    girls_dict = stat['girls_stat']
-    for key in extract_years(stat):
-        for i in girls_dict[key].keys():
-            if i in general_girl_stat.keys():
-                general_girl_stat[i] += girls_dict[key][i]
-            else:
-                general_girl_stat[i] = girls_dict[key][i]
-
-    for key in general_girl_stat:
-        answer_list.append((key, general_girl_stat[key]))
-
-    return sorted(answer_list, key=lambda x: x[1], reverse=True)
-
-
-def extract_year(stat, year):
-    """
-    Функция принимает на вход вычисленную статистику и год.
-    Результат — список tuple'ов (имя, количество) общей статистики для всех
-    имён в указанном году.
-    Список должен быть отсортирован по убыванию количества.
-    """
-    answer_list = []
-    general_girl_stat = {}
-    general_boy_stat = {}
-
-    girls_dict = stat['girls_stat']
-    boys_dict = stat['boys_stat']
-
+    general_stat = {}
+    sex_dict = stat['girls_stat' if sex == 'girls' else 'boys_stat']
     key = year
-    for i in girls_dict[key].keys():
-        if i in general_girl_stat.keys():
-            general_girl_stat[i] += girls_dict[key][i]
-        else:
-            general_girl_stat[i] = girls_dict[key][i]
 
-    for i in boys_dict[key].keys():
-        if i in general_boy_stat.keys():
-            general_boy_stat[i] += boys_dict[key][i]
+    for i in sex_dict[key].keys():
+        if i in general_stat.keys():
+            general_stat[i] += sex_dict[key][i]
         else:
-            general_boy_stat[i] = boys_dict[key][i]
+            general_stat[i] = sex_dict[key][i]
 
-    for key in general_girl_stat:
-        answer_list.append((key, general_girl_stat[key]))
-    for key in general_boy_stat:
-        answer_list.append((key, general_boy_stat[key]))
+    for key in general_stat.keys():
+        answer_list.append((key, general_stat[key]))
+
     return sorted(answer_list, key=lambda x: x[1], reverse=True)
 
 
@@ -177,21 +129,7 @@ def extract_year_male(stat, year):
     имён мальчиков в указанном году.
     Список должен быть отсортирован по убыванию количества.
     """
-    answer_list = []
-    general_boy_stat = {}
-    boys_dict = stat['boys_stat']
-    key = year
-
-    for i in boys_dict[key].keys():
-        if i in general_boy_stat.keys():
-            general_boy_stat[i] += boys_dict[key][i]
-        else:
-            general_boy_stat[i] = boys_dict[key][i]
-
-    for key in general_boy_stat.keys():
-        answer_list.append((key, general_boy_stat[key]))
-
-    return sorted(answer_list, key=lambda x: x[1], reverse=True)
+    return extract_year_indefinite(stat, year, 'boys')
 
 
 def extract_year_female(stat, year):
@@ -201,17 +139,17 @@ def extract_year_female(stat, year):
     имён девочек в указанном году.
     Список должен быть отсортирован по убыванию количества.
     """
-    answer_list = []
-    general_girl_stat = {}
-    girls_dict = stat['girls_stat']
+    return extract_year_indefinite(stat, year, 'girls')
 
-    for i in girls_dict[year].keys():
-        if i in general_girl_stat.keys():
-            general_girl_stat[i] += girls_dict[year][i]
-        else:
-            general_girl_stat[i] = girls_dict[year][i]
 
-    for key in general_girl_stat.keys():
-        answer_list.append((key, general_girl_stat[key]))
-
-    return sorted(answer_list, key=lambda x: x[1], reverse=True)
+def extract_year(stat, year):
+    """
+    Функция принимает на вход вычисленную статистику и год.
+    Результат — список tuple'ов (имя, количество) общей статистики для всех
+    имён в указанном году.
+    Список должен быть отсортирован по убыванию количества.
+    """
+    return sorted(
+        extract_year_male(stat, year) + extract_year_female(stat, year),
+        key=lambda x: x[1],
+        reverse=True)
