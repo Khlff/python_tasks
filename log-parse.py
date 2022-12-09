@@ -1,3 +1,4 @@
+import datetime
 import re
 import sys
 from collections import defaultdict
@@ -45,6 +46,7 @@ def main():
     args = get_params()
     input_log_filename = args[0]
     func_name = args[1]
+
     if func_name == 'resource':
         print(get_most_popular_resource(input_log_filename))
     if func_name == 'user':
