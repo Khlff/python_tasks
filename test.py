@@ -6,7 +6,7 @@ import urllib.request
 
 import long_classes as t
 
-
+with
 TEST_LOG = 'http://shannon.usu.edu.ru/ftp/python/hw4/test.log'
 
 
